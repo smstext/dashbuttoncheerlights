@@ -32,12 +32,15 @@ message = ['UB40 Red Red wine #cheerlights',
            'tickle me pink #cheerlights',
            'warmwhite is that such a colour? #cheerlights',]
 
+my_message = choice(message)
 def send_tweet():
-    twitter.update(message(status))
+    twitter.update(my_message(status))
 def arp_detect(pkt):
     if pkt[ARP].op == 1: #network request
         if pkt[ARP].hwsrc == 'xx:xx:xx:xx:xx:xx':
-            try:
-                send_tweet
+            return "dash button detected"
 
-                sleep 50
+while True:
+    send_tweet
+
+
