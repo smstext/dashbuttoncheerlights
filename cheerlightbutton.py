@@ -37,7 +37,7 @@ def send_tweet():
     twitter.update(my_message(status))
 def arp_detect(pkt):
     if pkt[ARP].op == 1: #network request
-        if pkt[ARP].hwsrc == 'xx:xx:xx:xx:xx:xx':
+        if pkt[ARP].hwsrc == 'FC:65:DE:55:69:C3':
             return "dash button detected"
 
 while True:
