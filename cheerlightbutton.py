@@ -18,23 +18,26 @@ twitter = Twython(
     access_token_secret
 )
 
-message = ['UB40 Red Red wine',
-           'Orange origina',
-	   'Lets follow the yellow brick road',
-           'Going rather green',
-           'Look at the blue sky',
-           'some wonderful violet flowers',
-           'white like a ghost',
-           'Cyan cat is coming',
-           'my face is going purple',
-           'magenta, what kinda colour is that',
-           'my nan had oldlace',
-           'tickle me pink',
-           'warmwhite is that such a colour?',]
+message = ['UB40 Red Red wine #cheerlights',
+           'Orange origina #cheerlights',
+	   'Lets follow the yellow brick road #cheerlights',
+           'Going rather green #cheerlights',
+           'Look at the blue sky #cheerlights',
+           'some wonderful violet flowers #cheerlights',
+           'white like a ghost #cheerlights',
+           'Cyan cat is coming #cheerlights',
+           'my face is going purple #cheerlights',
+           'magenta, what kinda colour is that #cheerlights',
+           'my nan had oldlace #cheerlights',
+           'tickle me pink #cheerlights',
+           'warmwhite is that such a colour? #cheerlights',]
 
 def send_tweet():
     twitter.update(message(status))
 def arp_detect(pkt):
     if pkt[ARP].op == 1: #network request
-        if pkt[ARP].hwsrc == 'xx:xx:xx:xx:xx:xx'
-                return send_tweet
+        if pkt[ARP].hwsrc == 'xx:xx:xx:xx:xx:xx':
+            try:
+                send_tweet
+
+                sleep 50
