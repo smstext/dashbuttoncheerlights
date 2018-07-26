@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from scapy.all import *
+import datetime
+import logging
 from time import sleep
 from random import choice
 from twython import Twython
@@ -18,6 +20,8 @@ twitter = Twython(
     access_token_secret
 )
 
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
 message = ['UB40 Red Red wine #cheerlights',
            'Orange origina #cheerlights',
 	   'Lets follow the yellow brick road #cheerlights',
@@ -33,14 +37,27 @@ message = ['UB40 Red Red wine #cheerlights',
            'warmwhite is that such a colour? #cheerlights',]
 
 my_message = choice(message)
+
 def send_tweet():
     twitter.update(my_message(status))
-def arp_detect(pkt):
-    if pkt[ARP].op == 1: #network request
-        if pkt[ARP].hwsrc == 'FC:65:DE:55:69:C3':
-            return "dash button detected"
 
-while True:
-    send_tweet
+def button_pressed_dash():
+  print 'Dash button pressed at %s' % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+  send_tweet
+  sleep(60)
 
+def udp_filter(pkt):
+  options = pkt[DHCP].options
+  for option in options:
+    if isinstance(option, tuple) and 'requested_addr' in option:
+      mac_to_action[pkt.src]()
+      break
 
+mac_to_action = {'FC:65:DE:55:69:C3' : button_pressed_dash}
+mac_id_list = list(mac_to_action.keys())
+
+print "Waiting for a button press..."
+sniff(prn=udp_filter, store=0, filter="udp", lfilter=lambda d: d.src in mac_id_list)
+
+if __name__ == "__main__":
+  main()
