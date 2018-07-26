@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from scapy.all import *
+import socket
+import struct
+import binascii
 import datetime
-import logging
 from time import sleep
 from random import choice
 from twython import Twython
@@ -20,7 +21,6 @@ twitter = Twython(
     access_token_secret
 )
 
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
 message = ['UB40 Red Red wine #cheerlights',
            'Orange origina #cheerlights',
@@ -41,23 +41,30 @@ my_message = choice(message)
 def send_tweet():
     twitter.update(my_message(status))
 
-def button_pressed_dash():
-  print 'Dash button pressed at %s' % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-  send_tweet
-  sleep(60)
 
-def udp_filter(pkt):
-  options = pkt[DHCP].options
-  for option in options:
-    if isinstance(option, tuple) and 'requested_addr' in option:
-      mac_to_action[pkt.src]()
-      break
+rawSocket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW,
+                          socket.htons(0x0003))
+MAC = 'fc65de5569c3'
 
-mac_to_action = {'FC:65:DE:55:69:C3' : button_pressed_dash}
-mac_id_list = list(mac_to_action.keys())
+while True:
+    packet = rawSocket.recvfrom(2048)
 
-print "Waiting for a button press..."
-sniff(prn=udp_filter, store=0, filter="udp", lfilter=lambda d: d.src in mac_id_list)
+    ethernet_header = packet[0][0:14]
+    ethernet_detailed = struct.unpack('!6s6s2s', ethernet_header)
 
-if __name__ == "__main__":
-  main()
+    arp_header = packet[0][14:42]
+    arp_detailed = struct.unpack('2s2s1s1s2s6s4s6s4s', arp_header)
+
+    # skip non-ARP packets
+    ethertype = ethernet_detailed[2]
+    if ethertype != '\x08\x06':
+        continue
+
+    source_mac = binascii.hexlify(arp_detailed[5])
+    dest_ip = socket.inet_ntoa(arp_detailed[8])
+
+    if source_mac == MAC:
+        print "Dash button pressed!, IP = " + dest_ip
+        send_tweet
+
+
