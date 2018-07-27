@@ -6,21 +6,15 @@ import binascii
 import datetime
 from time import sleep
 from random import choice
-from twython import Twython
-from auth import (
-    consumer_key,
-    consumer_secret,
-    access_token,
-    access_token_secret
-)
+import tweepy
 
-twitter = Twython(
-    consumer_key,
-    consumer_secret,
-    access_token,
-    access_token_secret
-)
-
+consumer_key        = 'enter here'
+consumer_secret     = 'enter here'
+access_token        = 'enter here'
+access_token_secret = 'enter here'
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth)
 
 message = ['UB40 Red Red wine #cheerlights',
            'Orange origina #cheerlights',
@@ -38,13 +32,9 @@ message = ['UB40 Red Red wine #cheerlights',
 
 my_message = choice(message)
 
-def send_tweet():
-    twitter.update(my_message(status))
-
-
 rawSocket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW,
                           socket.htons(0x0003))
-MAC = 'fc65de5569c3'
+MAC = 'dashmac here'
 
 while True:
     packet = rawSocket.recvfrom(2048)
@@ -65,6 +55,8 @@ while True:
 
     if source_mac == MAC:
         print "Dash button pressed!, IP = " + dest_ip
-        send_tweet
+        api.update_status(my_message)
+        print (my_message)
+
 
 
